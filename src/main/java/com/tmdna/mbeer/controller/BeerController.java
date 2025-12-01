@@ -2,7 +2,7 @@ package com.tmdna.mbeer.controller;
 
 import com.tmdna.mbeer.config.ApiPaths;
 import com.tmdna.mbeer.exception.NotFoundException;
-import com.tmdna.mbeer.model.Beer;
+import com.tmdna.mbeer.dto.BeerDto;
 import com.tmdna.mbeer.service.BeerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +23,7 @@ public class BeerController {
     @PatchMapping(ApiPaths.ID)
     public ResponseEntity<Void> updateBeerPartially(
             @PathVariable("id") UUID id,
-            @RequestBody Beer beer
+            @RequestBody BeerDto beer
     ) {
         beerService.updateBeerPartially(id, beer);
         return ResponseEntity.noContent().build();
@@ -38,26 +38,26 @@ public class BeerController {
     @PutMapping(ApiPaths.ID)
     public ResponseEntity<Void> updateBeerFully(
             @PathVariable("id") UUID id,
-            @RequestBody Beer beer
+            @RequestBody BeerDto beer
     ) {
         beerService.updateBeerFully(id, beer);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping
-    public ResponseEntity<List<Beer>> getBeers() {
+    public ResponseEntity<List<BeerDto>> getBeers() {
         return ResponseEntity.ok(beerService.getAllBeers());
     }
 
     @GetMapping(ApiPaths.ID)
-    public ResponseEntity<Beer> getBeer(@PathVariable("id") UUID id) {
+    public ResponseEntity<BeerDto> getBeer(@PathVariable("id") UUID id) {
         return ResponseEntity.ok(beerService.getBeerById(id)
                 .orElseThrow(NotFoundException::new));
     }
 
     @PostMapping
-    public ResponseEntity<Beer> addBeer(@RequestBody Beer beer) {
-        Beer createdBeer = beerService.createBeer(beer);
+    public ResponseEntity<BeerDto> addBeer(@RequestBody BeerDto beer) {
+        BeerDto createdBeer = beerService.createBeer(beer);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()

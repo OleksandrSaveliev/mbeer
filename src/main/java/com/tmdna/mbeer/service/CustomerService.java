@@ -1,21 +1,21 @@
 package com.tmdna.mbeer.service;
 
-import com.tmdna.mbeer.model.Customer;
+import com.tmdna.mbeer.dto.CustomerDto;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface CustomerService {
-    List<Customer> getAllCustomers();
+    List<CustomerDto> getAllCustomers();
 
-    Optional<Customer> getCustomerById(UUID customerId);
+    Optional<CustomerDto> getCustomerById(UUID customerId);
 
-    Customer createCustomer(Customer customer);
+    CustomerDto createCustomer(CustomerDto customer);
 
-    void updateCustomerFully(UUID id, Customer customer);
+    void updateCustomerFully(UUID id, CustomerDto customer);
 
     void deleteCustomer(UUID id);
 
-    void uprateCustomerPartially(UUID id, Customer customer);
+    void uprateCustomerPartially(UUID id, CustomerDto customer);
 }
