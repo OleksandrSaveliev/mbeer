@@ -1,0 +1,70 @@
+package com.tmdna.mbeer.controller;
+
+import com.tmdna.mbeer.config.ApiPaths;
+import com.tmdna.mbeer.exception.NotFoundException;
+import com.tmdna.mbeer.model.Beer;
+import com.tmdna.mbeer.service.BeerService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping(ApiPaths.Beer.BASE)
+public class BeerController {
+
+    private final BeerService beerService;
+
+    @PatchMapping(ApiPaths.ID)
+    public ResponseEntity<Void> updateBeerPartially(
+            @PathVariable("id") UUID id,
+            @RequestBody Beer beer
+    ) {
+        beerService.updateBeerPartially(id, beer);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping(ApiPaths.ID)
+    public ResponseEntity<Void> deleteBeer(@PathVariable("id") UUID id) {
+        beerService.deleteBeer(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping(ApiPaths.ID)
+    public ResponseEntity<Void> updateBeerFully(
+            @PathVariable("id") UUID id,
+            @RequestBody Beer beer
+    ) {
+        beerService.updateBeerFully(id, beer);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Beer>> getBeers() {
+        return ResponseEntity.ok(beerService.getAllBeers());
+    }
+
+    @GetMapping(ApiPaths.ID)
+    public ResponseEntity<Beer> getBeer(@PathVariable("id") UUID id) {
+        return ResponseEntity.ok(beerService.getBeerById(id)
+                .orElseThrow(NotFoundException::new));
+    }
+
+    @PostMapping
+    public ResponseEntity<Beer> addBeer(@RequestBody Beer beer) {
+        Beer createdBeer = beerService.createBeer(beer);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(createdBeer.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).body(createdBeer);
+    }
+}
