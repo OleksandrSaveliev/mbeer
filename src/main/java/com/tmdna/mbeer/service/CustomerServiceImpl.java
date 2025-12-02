@@ -1,6 +1,6 @@
 package com.tmdna.mbeer.service;
 
-import com.tmdna.mbeer.dto.CustomerDto;
+import com.tmdna.mbeer.dto.CustomerDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -9,10 +9,10 @@ import java.util.*;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
-    Map<UUID, CustomerDto> customers = new HashMap<>();
+    Map<UUID, CustomerDTO> customers = new HashMap<>();
 
     public CustomerServiceImpl() {
-        CustomerDto customer1 = CustomerDto.builder()
+        CustomerDTO customer1 = CustomerDTO.builder()
                 .id(UUID.randomUUID())
                 .customerName("Sasha")
                 .version(1)
@@ -20,7 +20,7 @@ public class CustomerServiceImpl implements CustomerService {
                 .updatedTime(LocalDateTime.now())
                 .build();
 
-        CustomerDto customer2 = CustomerDto.builder()
+        CustomerDTO customer2 = CustomerDTO.builder()
                 .id(UUID.randomUUID())
                 .customerName("Yura")
                 .version(1)
@@ -33,18 +33,18 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<CustomerDto> getAllCustomers() {
+    public List<CustomerDTO> getAllCustomers() {
         return new ArrayList<>(customers.values());
     }
 
     @Override
-    public Optional<CustomerDto> getCustomerById(UUID customerId) {
+    public Optional<CustomerDTO> getCustomerById(UUID customerId) {
         return Optional.of(customers.get(customerId));
     }
 
     @Override
-    public CustomerDto createCustomer(CustomerDto customer) {
-        CustomerDto createdCustomer = CustomerDto.builder()
+    public CustomerDTO createCustomer(CustomerDTO customer) {
+        CustomerDTO createdCustomer = CustomerDTO.builder()
                 .id(UUID.randomUUID())
                 .customerName(customer.getCustomerName())
                 .version(1)
@@ -58,8 +58,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void updateCustomerFully(UUID id, CustomerDto customer) {
-        CustomerDto existing = customers.get(id);
+    public void updateCustomerFully(UUID id, CustomerDTO customer) {
+        CustomerDTO existing = customers.get(id);
         if (existing != null) {
             existing.setCustomerName(customer.getCustomerName());
             existing.setVersion(existing.getVersion() + 1);
@@ -73,8 +73,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void uprateCustomerPartially(UUID id, CustomerDto customer) {
-        CustomerDto existing = customers.get(id);
+    public void uprateCustomerPartially(UUID id, CustomerDTO customer) {
+        CustomerDTO existing = customers.get(id);
 
         if (existing == null) {
             return;

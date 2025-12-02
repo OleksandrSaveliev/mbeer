@@ -2,7 +2,7 @@ package com.tmdna.mbeer.controller;
 
 import com.tmdna.mbeer.config.ApiPaths;
 import com.tmdna.mbeer.exception.NotFoundException;
-import com.tmdna.mbeer.dto.CustomerDto;
+import com.tmdna.mbeer.dto.CustomerDTO;
 import com.tmdna.mbeer.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ public class CustomerController {
     @PatchMapping(ApiPaths.ID)
     public ResponseEntity<Void> uprateCustomerPartially(
             @PathVariable("id") UUID id,
-            @RequestBody CustomerDto customer
+            @RequestBody CustomerDTO customer
     ) {
         customerService.uprateCustomerPartially(id, customer);
         return ResponseEntity.noContent().build();
@@ -40,19 +40,19 @@ public class CustomerController {
     @PutMapping(ApiPaths.ID)
     public ResponseEntity<Void> uprateCustomerFully(
             @PathVariable("id") UUID id,
-            @RequestBody CustomerDto customer
+            @RequestBody CustomerDTO customer
     ) {
         customerService.updateCustomerFully(id, customer);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping
-    public ResponseEntity<List<CustomerDto>> getAllCustomers() {
+    public ResponseEntity<List<CustomerDTO>> getAllCustomers() {
         return ResponseEntity.ok(customerService.getAllCustomers());
     }
 
     @GetMapping(ApiPaths.ID)
-    public ResponseEntity<CustomerDto> getCustomerById(@PathVariable("id") UUID id) {
+    public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable("id") UUID id) {
 
         log.debug("Getting user with Id: {}", id);
 
@@ -61,8 +61,8 @@ public class CustomerController {
     }
 
     @PostMapping
-    public ResponseEntity<CustomerDto> createCustomer(@RequestBody CustomerDto customer) {
-        CustomerDto createdCustomer = customerService.createCustomer(customer);
+    public ResponseEntity<CustomerDTO> createCustomer(@RequestBody CustomerDTO customer) {
+        CustomerDTO createdCustomer = customerService.createCustomer(customer);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()

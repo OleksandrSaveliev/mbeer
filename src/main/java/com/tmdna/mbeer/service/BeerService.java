@@ -1,21 +1,21 @@
 package com.tmdna.mbeer.service;
 
-import com.tmdna.mbeer.dto.BeerDto;
+import com.tmdna.mbeer.dto.BeerDTO;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface BeerService {
-    Optional<BeerDto> getBeerById(UUID id);
+    Optional<BeerDTO> getBeerById(UUID id);
 
-    List<BeerDto> getAllBeers();
+    List<BeerDTO> getAllBeers();
 
-    BeerDto createBeer(BeerDto beer);
+    BeerDTO createBeer(BeerDTO beer);
 
-    void updateBeerFully(UUID id, BeerDto beer);
+    void updateBeerFully(UUID id, BeerDTO beer);
 
     void deleteBeer(UUID id);
 
-    void updateBeerPartially(UUID id, BeerDto beer);
+    void updateBeerPartially(UUID id, BeerDTO beer);
 }
