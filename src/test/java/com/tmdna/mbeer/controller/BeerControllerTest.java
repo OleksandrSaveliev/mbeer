@@ -56,7 +56,7 @@ class BeerControllerTest {
     }
 
     @Test
-    void getBeerWithNotFoundException() throws Exception {
+    void getBeerByIdWithNotFoundException() throws Exception {
         given(beerService.getBeerById(any(UUID.class)))
                 .willReturn(Optional.empty());
 
@@ -143,7 +143,7 @@ class BeerControllerTest {
     }
 
     @Test
-    void getBeerById() throws Exception {
+    void getBeerByIdById() throws Exception {
 
         BeerDTO beer = beerServiceImpl.getAllBeers().getFirst();
 

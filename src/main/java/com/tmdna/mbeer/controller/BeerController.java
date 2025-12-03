@@ -1,8 +1,8 @@
 package com.tmdna.mbeer.controller;
 
 import com.tmdna.mbeer.config.ApiPaths;
-import com.tmdna.mbeer.exception.NotFoundException;
 import com.tmdna.mbeer.dto.BeerDTO;
+import com.tmdna.mbeer.exception.NotFoundException;
 import com.tmdna.mbeer.service.BeerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +50,7 @@ public class BeerController {
     }
 
     @GetMapping(ApiPaths.ID)
-    public ResponseEntity<BeerDTO> getBeer(@PathVariable("id") UUID id) {
+    public ResponseEntity<BeerDTO> getBeerById(@PathVariable("id") UUID id) {
         return ResponseEntity.ok(beerService.getBeerById(id)
                 .orElseThrow(NotFoundException::new));
     }
