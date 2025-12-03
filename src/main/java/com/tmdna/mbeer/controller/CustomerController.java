@@ -61,7 +61,7 @@ public class CustomerController {
     }
 
     @PostMapping
-    public ResponseEntity<CustomerDTO> createCustomer(@RequestBody CustomerDTO customer) {
+    public ResponseEntity<Void> createCustomer(@RequestBody CustomerDTO customer) {
         CustomerDTO createdCustomer = customerService.createCustomer(customer);
 
         URI location = ServletUriComponentsBuilder
@@ -70,7 +70,7 @@ public class CustomerController {
                 .buildAndExpand(createdCustomer.getId())
                 .toUri();
 
-        return ResponseEntity.created(location).body(createdCustomer);
+        return ResponseEntity.created(location).build();
     }
 
 }

@@ -56,7 +56,7 @@ public class BeerController {
     }
 
     @PostMapping
-    public ResponseEntity<BeerDTO> addBeer(@RequestBody BeerDTO beer) {
+    public ResponseEntity<Void> createBeer(@RequestBody BeerDTO beer) {
         BeerDTO createdBeer = beerService.createBeer(beer);
 
         URI location = ServletUriComponentsBuilder
@@ -65,6 +65,6 @@ public class BeerController {
                 .buildAndExpand(createdBeer.getId())
                 .toUri();
 
-        return ResponseEntity.created(location).body(createdBeer);
+        return ResponseEntity.created(location).build();
     }
 }
