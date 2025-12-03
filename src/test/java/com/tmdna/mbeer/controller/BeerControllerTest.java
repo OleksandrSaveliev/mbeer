@@ -2,8 +2,8 @@ package com.tmdna.mbeer.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tmdna.mbeer.config.ApiPaths;
-import com.tmdna.mbeer.exception.NotFoundException;
 import com.tmdna.mbeer.dto.BeerDTO;
+import com.tmdna.mbeer.exception.NotFoundException;
 import com.tmdna.mbeer.service.BeerService;
 import com.tmdna.mbeer.service.BeerServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -102,6 +102,8 @@ class BeerControllerTest {
     @Test
     void updateBeerFully() throws Exception {
         BeerDTO beer = beerServiceImpl.getAllBeers().getFirst();
+
+        given(beerService.updateBeerFully(any(UUID.class), any())).willReturn(Optional.of(beer));
 
         mvc.perform(put(ApiPaths.Beer.WITH_ID, beer.getId())
                         .accept(MediaType.APPLICATION_JSON)

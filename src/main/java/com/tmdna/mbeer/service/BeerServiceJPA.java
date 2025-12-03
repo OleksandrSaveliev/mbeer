@@ -7,9 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @Primary
@@ -38,8 +40,24 @@ public class BeerServiceJPA implements BeerService {
     }
 
     @Override
-    public void updateBeerFully(UUID id, BeerDTO beer) {
+    public Optional<BeerDTO> updateBeerFully(UUID id, BeerDTO beer) {
+        AtomicReference<Optional<BeerDTO>> atomicReference = new AtomicReference<>();
 
+        beerRepository.findById(id).ifPresentOrElse(foundBeer -> {
+                    foundBeer.setBeerName(beer.getBeerName());
+                    foundBeer.setBeerStyle(beer.getBeerStyle());
+                    foundBeer.setUpdatedTime(LocalDateTime.now());
+                    foundBeer.setUpd(beer.getUpd());
+                    foundBeer.setQuantityOnHand(beer.getQuantityOnHand());
+                    foundBeer.setPrice(beer.getPrice());
+
+                    atomicReference.set(Optional.of(
+                            beerMapper.beerToBeerDto(
+                                    beerRepository.save(foundBeer))));
+                }, () -> atomicReference.set(Optional.empty())
+        );
+
+        return atomicReference.get();
     }
 
     @Override

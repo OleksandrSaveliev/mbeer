@@ -2,6 +2,7 @@ package com.tmdna.mbeer.controller;
 
 import com.tmdna.mbeer.dto.BeerDTO;
 import com.tmdna.mbeer.exception.NotFoundException;
+import com.tmdna.mbeer.mapper.BeerMapper;
 import com.tmdna.mbeer.model.Beer;
 import com.tmdna.mbeer.repository.BeerRepository;
 import org.junit.jupiter.api.Test;
@@ -20,11 +21,45 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class BeerControllerIT {
+    public static final UUID FAILED_UUID = UUID.fromString("11111111-1111-1111-1111-111111111111");
+
     @Autowired
     BeerController controller;
 
     @Autowired
     BeerRepository beerRepository;
+
+    @Autowired
+    BeerMapper beerMapper;
+
+    @Test
+    void updateBeerFullyNotFoundTest() {
+        BeerDTO beerDTO = BeerDTO.builder().build();
+        assertThrows(NotFoundException.class, () -> controller.updateBeerFully(FAILED_UUID, beerDTO));
+    }
+
+    @Rollback
+    @Transactional
+    @Test
+    void updateBeerFullyTest() {
+        Beer beer = beerRepository.findAll().stream().findFirst().orElseThrow(() -> new RuntimeException("TEST FAILED"));
+        BeerDTO beerDTO = beerMapper.beerToBeerDto(beer);
+        beerDTO.setVersion(null);
+        beerDTO.setId(null);
+        final String newName = "New Name";
+        final String newStyle = "New Style";
+        beerDTO.setBeerName(newName);
+        beerDTO.setBeerStyle(newStyle);
+
+        ResponseEntity<Void> response = controller.updateBeerFully(beer.getId(), beerDTO);
+        assertEquals(HttpStatusCode.valueOf(204), response.getStatusCode());
+
+        BeerDTO updatedBeer = controller.getBeerById(beer.getId()).getBody();
+
+        assertNotNull(updatedBeer);
+        assertEquals(newName, updatedBeer.getBeerName());
+        assertEquals(newStyle, updatedBeer.getBeerStyle());
+    }
 
     @Rollback
     @Transactional
@@ -48,9 +83,7 @@ class BeerControllerIT {
 
     @Test
     void beerNotFoundTest() {
-        UUID id = UUID.fromString("11111111-1111-1111-1111-111111111111");
-
-        assertThrows(NotFoundException.class, () -> controller.getBeerById(id));
+        assertThrows(NotFoundException.class, () -> controller.getBeerById(FAILED_UUID));
     }
 
     @Test

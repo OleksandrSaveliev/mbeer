@@ -40,7 +40,7 @@ public class BeerController {
             @PathVariable("id") UUID id,
             @RequestBody BeerDTO beer
     ) {
-        beerService.updateBeerFully(id, beer);
+        beerService.updateBeerFully(id, beer).orElseThrow(NotFoundException::new);
         return ResponseEntity.noContent().build();
     }
 
