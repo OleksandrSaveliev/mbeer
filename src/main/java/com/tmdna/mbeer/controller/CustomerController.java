@@ -1,8 +1,8 @@
 package com.tmdna.mbeer.controller;
 
 import com.tmdna.mbeer.config.ApiPaths;
+import com.tmdna.mbeer.dto.CustomerDTO;
 import com.tmdna.mbeer.exception.NotFoundException;
-import com.tmdna.mbeer.model.Customer;
 import com.tmdna.mbeer.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,36 +23,38 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @PatchMapping(ApiPaths.ID)
-    public ResponseEntity<Void> uprateCustomerPartially(
+    public ResponseEntity<Void> updateCustomerPartially(
             @PathVariable("id") UUID id,
-            @RequestBody Customer customer
+            @RequestBody CustomerDTO customer
     ) {
-        customerService.uprateCustomerPartially(id, customer);
+        customerService.updateCustomerPartially(id, customer).orElseThrow(NotFoundException::new);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping(ApiPaths.ID)
     public ResponseEntity<Void> deleteCustomer(@PathVariable("id") UUID id) {
-        customerService.deleteCustomer(id);
+        if (!customerService.deleteCustomer(id)) {
+            throw new NotFoundException(String.format("Customer with id: %s does not exists.", id));
+        }
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping(ApiPaths.ID)
-    public ResponseEntity<Void> uprateCustomerFully(
+    public ResponseEntity<Void> updateCustomerFully(
             @PathVariable("id") UUID id,
-            @RequestBody Customer customer
+            @RequestBody CustomerDTO customer
     ) {
-        customerService.updateCustomerFully(id, customer);
+        customerService.updateCustomerFully(id, customer).orElseThrow(NotFoundException::new);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping
-    public ResponseEntity<List<Customer>> getAllCustomers() {
+    public ResponseEntity<List<CustomerDTO>> getAllCustomers() {
         return ResponseEntity.ok(customerService.getAllCustomers());
     }
 
     @GetMapping(ApiPaths.ID)
-    public ResponseEntity<Customer> getCustomerById(@PathVariable("id") UUID id) {
+    public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable("id") UUID id) {
 
         log.debug("Getting user with Id: {}", id);
 
@@ -61,8 +63,8 @@ public class CustomerController {
     }
 
     @PostMapping
-    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
-        Customer createdCustomer = customerService.createCustomer(customer);
+    public ResponseEntity<Void> createCustomer(@RequestBody CustomerDTO customer) {
+        CustomerDTO createdCustomer = customerService.createCustomer(customer);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -70,7 +72,7 @@ public class CustomerController {
                 .buildAndExpand(createdCustomer.getId())
                 .toUri();
 
-        return ResponseEntity.created(location).body(createdCustomer);
+        return ResponseEntity.created(location).build();
     }
 
 }

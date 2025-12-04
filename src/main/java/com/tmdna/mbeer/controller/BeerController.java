@@ -1,8 +1,8 @@
 package com.tmdna.mbeer.controller;
 
 import com.tmdna.mbeer.config.ApiPaths;
+import com.tmdna.mbeer.dto.BeerDTO;
 import com.tmdna.mbeer.exception.NotFoundException;
-import com.tmdna.mbeer.model.Beer;
 import com.tmdna.mbeer.service.BeerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +23,7 @@ public class BeerController {
     @PatchMapping(ApiPaths.ID)
     public ResponseEntity<Void> updateBeerPartially(
             @PathVariable("id") UUID id,
-            @RequestBody Beer beer
+            @RequestBody BeerDTO beer
     ) {
         beerService.updateBeerPartially(id, beer);
         return ResponseEntity.noContent().build();
@@ -31,33 +31,35 @@ public class BeerController {
 
     @DeleteMapping(ApiPaths.ID)
     public ResponseEntity<Void> deleteBeer(@PathVariable("id") UUID id) {
-        beerService.deleteBeer(id);
+        if (!beerService.deleteBeer(id)) {
+            throw new NotFoundException(String.format("Beer with id: %s does not exists.", id));
+        }
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping(ApiPaths.ID)
     public ResponseEntity<Void> updateBeerFully(
             @PathVariable("id") UUID id,
-            @RequestBody Beer beer
+            @RequestBody BeerDTO beer
     ) {
-        beerService.updateBeerFully(id, beer);
+        beerService.updateBeerFully(id, beer).orElseThrow(NotFoundException::new);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping
-    public ResponseEntity<List<Beer>> getBeers() {
+    public ResponseEntity<List<BeerDTO>> getBeers() {
         return ResponseEntity.ok(beerService.getAllBeers());
     }
 
     @GetMapping(ApiPaths.ID)
-    public ResponseEntity<Beer> getBeer(@PathVariable("id") UUID id) {
+    public ResponseEntity<BeerDTO> getBeerById(@PathVariable("id") UUID id) {
         return ResponseEntity.ok(beerService.getBeerById(id)
                 .orElseThrow(NotFoundException::new));
     }
 
     @PostMapping
-    public ResponseEntity<Beer> addBeer(@RequestBody Beer beer) {
-        Beer createdBeer = beerService.createBeer(beer);
+    public ResponseEntity<Void> createBeer(@RequestBody BeerDTO beer) {
+        BeerDTO createdBeer = beerService.createBeer(beer);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -65,6 +67,6 @@ public class BeerController {
                 .buildAndExpand(createdBeer.getId())
                 .toUri();
 
-        return ResponseEntity.created(location).body(createdBeer);
+        return ResponseEntity.created(location).build();
     }
 }

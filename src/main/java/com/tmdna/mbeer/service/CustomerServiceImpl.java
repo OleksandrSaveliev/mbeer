@@ -1,6 +1,6 @@
 package com.tmdna.mbeer.service;
 
-import com.tmdna.mbeer.model.Customer;
+import com.tmdna.mbeer.dto.CustomerDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -9,10 +9,10 @@ import java.util.*;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
-    Map<UUID, Customer> customers = new HashMap<>();
+    Map<UUID, CustomerDTO> customers = new HashMap<>();
 
     public CustomerServiceImpl() {
-        Customer customer1 = Customer.builder()
+        CustomerDTO customer1 = CustomerDTO.builder()
                 .id(UUID.randomUUID())
                 .customerName("Sasha")
                 .version(1)
@@ -20,7 +20,7 @@ public class CustomerServiceImpl implements CustomerService {
                 .updatedTime(LocalDateTime.now())
                 .build();
 
-        Customer customer2 = Customer.builder()
+        CustomerDTO customer2 = CustomerDTO.builder()
                 .id(UUID.randomUUID())
                 .customerName("Yura")
                 .version(1)
@@ -33,18 +33,18 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<Customer> getAllCustomers() {
+    public List<CustomerDTO> getAllCustomers() {
         return new ArrayList<>(customers.values());
     }
 
     @Override
-    public Optional<Customer> getCustomerById(UUID customerId) {
+    public Optional<CustomerDTO> getCustomerById(UUID customerId) {
         return Optional.of(customers.get(customerId));
     }
 
     @Override
-    public Customer createCustomer(Customer customer) {
-        Customer createdCustomer = Customer.builder()
+    public CustomerDTO createCustomer(CustomerDTO customer) {
+        CustomerDTO createdCustomer = CustomerDTO.builder()
                 .id(UUID.randomUUID())
                 .customerName(customer.getCustomerName())
                 .version(1)
@@ -58,26 +58,33 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void updateCustomerFully(UUID id, Customer customer) {
-        Customer existing = customers.get(id);
-        if (existing != null) {
+    public Optional<CustomerDTO> updateCustomerFully(UUID id, CustomerDTO customer) {
+        CustomerDTO existing = customers.get(id);
+        if (existing == null) {
+            return Optional.empty();
+        }
             existing.setCustomerName(customer.getCustomerName());
             existing.setVersion(existing.getVersion() + 1);
             existing.setUpdatedTime(LocalDateTime.now());
+
+        return Optional.of(existing);
+    }
+
+    @Override
+    public boolean deleteCustomer(UUID id) {
+        if (!customers.containsKey(id)) {
+            return false;
         }
-    }
-
-    @Override
-    public void deleteCustomer(UUID id) {
         customers.remove(id);
+        return true;
     }
 
     @Override
-    public void uprateCustomerPartially(UUID id, Customer customer) {
-        Customer existing = customers.get(id);
+    public Optional<CustomerDTO> updateCustomerPartially(UUID id, CustomerDTO customer) {
+        CustomerDTO existing = customers.get(id);
 
         if (existing == null) {
-            return;
+            return Optional.empty();
         }
 
         if (StringUtils.hasText(customer.getCustomerName())) {
@@ -85,6 +92,6 @@ public class CustomerServiceImpl implements CustomerService {
             existing.setVersion(existing.getVersion() + 1);
             existing.setUpdatedTime(LocalDateTime.now());
         }
-
+        return Optional.of(existing);
     }
 }

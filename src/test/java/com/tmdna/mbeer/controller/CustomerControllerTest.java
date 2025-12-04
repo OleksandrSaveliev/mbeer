@@ -2,8 +2,8 @@ package com.tmdna.mbeer.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tmdna.mbeer.config.ApiPaths;
+import com.tmdna.mbeer.dto.CustomerDTO;
 import com.tmdna.mbeer.exception.NotFoundException;
-import com.tmdna.mbeer.model.Customer;
 import com.tmdna.mbeer.service.CustomerService;
 import com.tmdna.mbeer.service.CustomerServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +47,7 @@ class CustomerControllerTest {
     ArgumentCaptor<UUID> uuidArgumentCaptor;
 
     @Captor
-    ArgumentCaptor<Customer> customerArgumentCaptor;
+    ArgumentCaptor<CustomerDTO> customerArgumentCaptor;
 
     CustomerServiceImpl customerServiceImpl;
 
@@ -70,10 +70,12 @@ class CustomerControllerTest {
 
     @Test
     void updateBeerPartially() throws Exception {
-        Customer customer = customerServiceImpl.getAllCustomers().getFirst();
+        CustomerDTO customer = customerServiceImpl.getAllCustomers().getFirst();
 
         Map<String, Object> customerMap = new HashMap<>();
         customerMap.put("customerName", "New Name");
+
+        given(customerService.updateCustomerPartially(any(UUID.class), any())).willReturn(Optional.of(customer));
 
         mvc.perform(patch(ApiPaths.Customer.WITH_ID, customer.getId())
                         .accept(MediaType.APPLICATION_JSON)
@@ -81,7 +83,7 @@ class CustomerControllerTest {
                         .content(objectMapper.writeValueAsString(customerMap)))
                 .andExpect(status().isNoContent());
 
-        verify(customerService).uprateCustomerPartially(uuidArgumentCaptor.capture(), customerArgumentCaptor.capture());
+        verify(customerService).updateCustomerPartially(uuidArgumentCaptor.capture(), customerArgumentCaptor.capture());
 
         assertEquals(customer.getId(), uuidArgumentCaptor.getValue());
         assertEquals(customerMap.get("customerName"), customerArgumentCaptor.getValue().getCustomerName());
@@ -89,7 +91,9 @@ class CustomerControllerTest {
 
     @Test
     void deleteCustomer() throws Exception {
-        Customer customer = customerServiceImpl.getAllCustomers().getFirst();
+        CustomerDTO customer = customerServiceImpl.getAllCustomers().getFirst();
+
+        given(customerService.deleteCustomer(any(UUID.class))).willReturn(true);
 
         mvc.perform(delete(ApiPaths.Customer.WITH_ID, customer.getId())
                         .accept(MediaType.APPLICATION_JSON))
@@ -101,8 +105,10 @@ class CustomerControllerTest {
     }
 
     @Test
-    void uprateCustomerFully() throws Exception {
-        Customer customer = customerServiceImpl.getAllCustomers().getFirst();
+    void updateCustomerFully() throws Exception {
+        CustomerDTO customer = customerServiceImpl.getAllCustomers().getFirst();
+
+        given(customerService.updateCustomerFully(any(UUID.class),any())).willReturn(Optional.of(customer));
 
         mvc.perform(put(ApiPaths.Customer.WITH_ID, customer.getId())
                         .accept(MediaType.APPLICATION_JSON)
@@ -110,18 +116,18 @@ class CustomerControllerTest {
                         .content(objectMapper.writeValueAsString(customer)))
                 .andExpect(status().isNoContent());
 
-        verify(customerService).updateCustomerFully(any(UUID.class), any(Customer.class));
+        verify(customerService).updateCustomerFully(any(UUID.class), any(CustomerDTO.class));
     }
 
     @Test
     void createCustomer() throws Exception {
-        Customer customer = customerServiceImpl.getAllCustomers().getFirst();
+        CustomerDTO customer = customerServiceImpl.getAllCustomers().getFirst();
         customer.setId(null);
         customer.setUpdatedTime(null);
         customer.setCreatedTime(null);
         customer.setVersion(null);
 
-        given(customerService.createCustomer(any(Customer.class)))
+        given(customerService.createCustomer(any(CustomerDTO.class)))
                 .willReturn(customerServiceImpl.getAllCustomers().get(1));
 
         mvc.perform(post(ApiPaths.Customer.BASE)
@@ -135,7 +141,7 @@ class CustomerControllerTest {
     @Test
     void getCustomer() throws Exception {
 
-        Customer customer = customerServiceImpl.getAllCustomers().getFirst();
+        CustomerDTO customer = customerServiceImpl.getAllCustomers().getFirst();
 
         given(customerService.getCustomerById(customer.getId())).willReturn(Optional.of(customer));
 

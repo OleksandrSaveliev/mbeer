@@ -2,8 +2,8 @@ package com.tmdna.mbeer.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tmdna.mbeer.config.ApiPaths;
+import com.tmdna.mbeer.dto.BeerDTO;
 import com.tmdna.mbeer.exception.NotFoundException;
-import com.tmdna.mbeer.model.Beer;
 import com.tmdna.mbeer.service.BeerService;
 import com.tmdna.mbeer.service.BeerServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,7 +45,7 @@ class BeerControllerTest {
     BeerServiceImpl beerServiceImpl;
 
     @Captor
-    ArgumentCaptor<Beer> beerArgumentCaptor;
+    ArgumentCaptor<BeerDTO> beerArgumentCaptor;
 
     @Captor
     ArgumentCaptor<UUID> uuidArgumentCaptor;
@@ -56,7 +56,7 @@ class BeerControllerTest {
     }
 
     @Test
-    void getBeerWithNotFoundException() throws Exception {
+    void getBeerByIdWithNotFoundException() throws Exception {
         given(beerService.getBeerById(any(UUID.class)))
                 .willReturn(Optional.empty());
 
@@ -69,7 +69,7 @@ class BeerControllerTest {
 
     @Test
     void updateBeerPartially() throws Exception {
-        Beer beer = beerServiceImpl.getAllBeers().getFirst();
+        BeerDTO beer = beerServiceImpl.getAllBeers().getFirst();
 
         Map<String, Object> beerMap = new HashMap<>();
         beerMap.put("beerName", "New Name");
@@ -88,7 +88,9 @@ class BeerControllerTest {
 
     @Test
     void deleteBeer() throws Exception {
-        Beer beer = beerServiceImpl.getAllBeers().getFirst();
+        BeerDTO beer = beerServiceImpl.getAllBeers().getFirst();
+
+        given(beerService.deleteBeer(any(UUID.class))).willReturn(true);
 
         mvc.perform(delete(ApiPaths.Beer.WITH_ID, beer.getId())
                         .accept(MediaType.APPLICATION_JSON))
@@ -101,7 +103,9 @@ class BeerControllerTest {
 
     @Test
     void updateBeerFully() throws Exception {
-        Beer beer = beerServiceImpl.getAllBeers().getFirst();
+        BeerDTO beer = beerServiceImpl.getAllBeers().getFirst();
+
+        given(beerService.updateBeerFully(any(UUID.class), any())).willReturn(Optional.of(beer));
 
         mvc.perform(put(ApiPaths.Beer.WITH_ID, beer.getId())
                         .accept(MediaType.APPLICATION_JSON)
@@ -109,18 +113,18 @@ class BeerControllerTest {
                         .content(objectMapper.writeValueAsString(beer)))
                 .andExpect(status().isNoContent());
 
-        verify(beerService).updateBeerFully(any(UUID.class), any(Beer.class));
+        verify(beerService).updateBeerFully(any(UUID.class), any(BeerDTO.class));
     }
 
     @Test
     void createBeer() throws Exception {
-        Beer beer = beerServiceImpl.getAllBeers().getFirst();
+        BeerDTO beer = beerServiceImpl.getAllBeers().getFirst();
         beer.setId(null);
         beer.setVersion(null);
         beer.setUpdatedTime(null);
         beer.setCreatedTime(null);
 
-        given(beerService.createBeer(any(Beer.class)))
+        given(beerService.createBeer(any(BeerDTO.class)))
                 .willReturn(beerServiceImpl.getAllBeers().get(1));
 
         mvc.perform(post(ApiPaths.Beer.BASE)
@@ -143,9 +147,9 @@ class BeerControllerTest {
     }
 
     @Test
-    void getBeerById() throws Exception {
+    void getBeerByIdById() throws Exception {
 
-        Beer beer = beerServiceImpl.getAllBeers().getFirst();
+        BeerDTO beer = beerServiceImpl.getAllBeers().getFirst();
 
         given(beerService.getBeerById(beer.getId())).willReturn(Optional.of(beer));
 
