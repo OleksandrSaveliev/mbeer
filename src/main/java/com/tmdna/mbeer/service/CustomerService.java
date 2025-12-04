@@ -2,7 +2,6 @@ package com.tmdna.mbeer.service;
 
 import com.tmdna.mbeer.dto.CustomerDTO;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,5 +17,5 @@ public interface CustomerService {
 
     boolean deleteCustomer(UUID id);
 
-    void uprateCustomerPartially(UUID id, CustomerDTO customer);
+    Optional<CustomerDTO> updateCustomerPartially(UUID id, CustomerDTO customer);
 }

@@ -75,13 +75,15 @@ class CustomerControllerTest {
         Map<String, Object> customerMap = new HashMap<>();
         customerMap.put("customerName", "New Name");
 
+        given(customerService.updateCustomerPartially(any(UUID.class), any())).willReturn(Optional.of(customer));
+
         mvc.perform(patch(ApiPaths.Customer.WITH_ID, customer.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(customerMap)))
                 .andExpect(status().isNoContent());
 
-        verify(customerService).uprateCustomerPartially(uuidArgumentCaptor.capture(), customerArgumentCaptor.capture());
+        verify(customerService).updateCustomerPartially(uuidArgumentCaptor.capture(), customerArgumentCaptor.capture());
 
         assertEquals(customer.getId(), uuidArgumentCaptor.getValue());
         assertEquals(customerMap.get("customerName"), customerArgumentCaptor.getValue().getCustomerName());
@@ -103,7 +105,7 @@ class CustomerControllerTest {
     }
 
     @Test
-    void uprateCustomerFully() throws Exception {
+    void updateCustomerFully() throws Exception {
         CustomerDTO customer = customerServiceImpl.getAllCustomers().getFirst();
 
         given(customerService.updateCustomerFully(any(UUID.class),any())).willReturn(Optional.of(customer));

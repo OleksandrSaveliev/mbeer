@@ -27,7 +27,7 @@ public class CustomerController {
             @PathVariable("id") UUID id,
             @RequestBody CustomerDTO customer
     ) {
-        customerService.uprateCustomerPartially(id, customer);
+        customerService.updateCustomerPartially(id, customer).orElseThrow(NotFoundException::new);
         return ResponseEntity.noContent().build();
     }
 
@@ -40,7 +40,7 @@ public class CustomerController {
     }
 
     @PutMapping(ApiPaths.ID)
-    public ResponseEntity<Void> uprateCustomerFully(
+    public ResponseEntity<Void> updateCustomerFully(
             @PathVariable("id") UUID id,
             @RequestBody CustomerDTO customer
     ) {

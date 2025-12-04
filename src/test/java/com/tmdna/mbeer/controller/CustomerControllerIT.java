@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class CustomerControllerIT {
-    private final UUID FAILED_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
+    private static final UUID FAILED_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
     @Autowired
     CustomerController controller;
@@ -38,6 +38,27 @@ class CustomerControllerIT {
         assertThrows(NotFoundException.class, () -> controller.deleteCustomer(FAILED_ID));
     }
 
+    @Test
+    void updateCustomerPartiallyNotFoundTest() {
+        CustomerDTO customerDTO = CustomerDTO.builder().build();
+        assertThrows(NotFoundException.class, () -> controller.updateCustomerPartially(FAILED_ID, customerDTO));
+    }
+
+    @Rollback
+    @Transactional
+    @Test
+    void updateCustomerPartially() {
+        Customer customer = customerRepository.findAll().getFirst();
+        UUID id = customer.getId();
+        final String newName = "New Name";
+        CustomerDTO customerDTO = customerMapper.customerToCustomerDto(customer);
+        customerDTO.setCustomerName(newName);
+
+        ResponseEntity<Void> response = controller.updateCustomerPartially(id, customerDTO);
+        assertEquals(HttpStatusCode.valueOf(204), response.getStatusCode());
+        assertEquals(newName, customerRepository.findById(id).orElseThrow(NotFoundException::new).getCustomerName());
+    }
+
     @Rollback
     @Transactional
     @Test
@@ -51,7 +72,7 @@ class CustomerControllerIT {
     @Test
     void updateCustomerFullyNotFoundTest() {
         CustomerDTO customerDTO = CustomerDTO.builder().build();
-        assertThrows(NotFoundException.class, () -> controller.uprateCustomerFully(FAILED_ID, customerDTO));
+        assertThrows(NotFoundException.class, () -> controller.updateCustomerFully(FAILED_ID, customerDTO));
     }
 
     @Rollback
@@ -64,7 +85,7 @@ class CustomerControllerIT {
         CustomerDTO customerDTO = customerMapper.customerToCustomerDto(customer);
         customerDTO.setCustomerName(newName);
 
-        ResponseEntity<Void> response = controller.uprateCustomerFully(id, customerDTO);
+        ResponseEntity<Void> response = controller.updateCustomerFully(id, customerDTO);
         assertEquals(HttpStatusCode.valueOf(204), response.getStatusCode());
         assertEquals(newName, customerRepository.findById(id).orElseThrow(NotFoundException::new).getCustomerName());
     }

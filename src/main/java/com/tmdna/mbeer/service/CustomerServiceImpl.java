@@ -80,11 +80,11 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void uprateCustomerPartially(UUID id, CustomerDTO customer) {
+    public Optional<CustomerDTO> updateCustomerPartially(UUID id, CustomerDTO customer) {
         CustomerDTO existing = customers.get(id);
 
         if (existing == null) {
-            return;
+            return Optional.empty();
         }
 
         if (StringUtils.hasText(customer.getCustomerName())) {
@@ -92,6 +92,6 @@ public class CustomerServiceImpl implements CustomerService {
             existing.setVersion(existing.getVersion() + 1);
             existing.setUpdatedTime(LocalDateTime.now());
         }
-
+        return Optional.of(existing);
     }
 }
