@@ -2,6 +2,7 @@ package com.tmdna.mbeer.service;
 
 import com.tmdna.mbeer.dto.CustomerDTO;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -13,7 +14,7 @@ public interface CustomerService {
 
     CustomerDTO createCustomer(CustomerDTO customer);
 
-    void updateCustomerFully(UUID id, CustomerDTO customer);
+    Optional<CustomerDTO> updateCustomerFully(UUID id, CustomerDTO customer);
 
     void deleteCustomer(UUID id);
 

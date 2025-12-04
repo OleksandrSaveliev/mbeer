@@ -2,12 +2,15 @@ package com.tmdna.mbeer.controller;
 
 import com.tmdna.mbeer.dto.CustomerDTO;
 import com.tmdna.mbeer.exception.NotFoundException;
+import com.tmdna.mbeer.mapper.CustomerMapper;
 import com.tmdna.mbeer.model.Customer;
 import com.tmdna.mbeer.repository.CustomerRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +26,24 @@ class CustomerControllerIT {
 
     @Autowired
     CustomerRepository customerRepository;
+
+    @Autowired
+    CustomerMapper customerMapper;
+
+    @Rollback
+    @Transactional
+    @Test
+    void updateCustomerFullyTest() {
+        Customer customer = customerRepository.findAll().getFirst();
+        UUID id = customer.getId();
+        final String newName = "New Name";
+        CustomerDTO customerDTO = customerMapper.customerToCustomerDto(customer);
+        customerDTO.setCustomerName(newName);
+
+        ResponseEntity<Void> response = controller.uprateCustomerFully(id, customerDTO);
+        assertEquals(HttpStatusCode.valueOf(204), response.getStatusCode());
+        assertEquals(newName, customerRepository.findById(id).orElseThrow(NotFoundException::new).getCustomerName());
+    }
 
     @Test
     void getCustomerByIdNotFoundTest () {

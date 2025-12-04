@@ -23,7 +23,7 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @PatchMapping(ApiPaths.ID)
-    public ResponseEntity<Void> uprateCustomerPartially(
+    public ResponseEntity<Void> updateCustomerPartially(
             @PathVariable("id") UUID id,
             @RequestBody CustomerDTO customer
     ) {
