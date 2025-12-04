@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.Rollback;
@@ -33,6 +34,36 @@ class BeerControllerIT {
     @Autowired
     BeerMapper beerMapper;
 
+    @Rollback
+    @Transactional
+    @Test
+    void updateBeerPartially() {
+        final String updatedName = "Updated Name";
+        final String updatedStyle = "Updated Style";
+        UUID id = beerRepository.findAll().getFirst().getId();
+
+        BeerDTO beerDTO = BeerDTO.builder()
+                .beerName(updatedName)
+                .build();
+
+        ResponseEntity<Void> response = controller.updateBeerPartially(id, beerDTO);
+
+        assertEquals(HttpStatus.valueOf(204), response.getStatusCode());
+        assertEquals(beerDTO.getBeerName(), beerRepository.findById(id).orElseThrow(NotFoundException::new).getBeerName());
+
+        UUID id2 = beerRepository.findAll().get(1).getId();
+
+        BeerDTO beerDTO2 = BeerDTO.builder()
+                .beerName(updatedName)
+                .beerStyle(updatedStyle)
+                .build();
+
+        ResponseEntity<Void> response2 = controller.updateBeerPartially(id2, beerDTO2);
+
+        assertEquals(HttpStatus.valueOf(204), response2.getStatusCode());
+        assertEquals(beerDTO2.getBeerName(), beerRepository.findById(id2).orElseThrow(NotFoundException::new).getBeerName());
+        assertEquals(beerDTO2.getBeerStyle(), beerRepository.findById(id2).orElseThrow(NotFoundException::new).getBeerStyle());
+    }
 
     @Test
     void deleteBeerByIdNotFoundTest() {

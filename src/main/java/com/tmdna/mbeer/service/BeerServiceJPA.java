@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -70,7 +71,34 @@ public class BeerServiceJPA implements BeerService {
     }
 
     @Override
-    public void updateBeerPartially(UUID id, BeerDTO beer) {
+    public Optional<BeerDTO> updateBeerPartially(UUID id, BeerDTO beer) {
+        AtomicReference<Optional<BeerDTO>> atomicReference = new AtomicReference<>();
 
+        beerRepository.findById(id).ifPresentOrElse(foundBeer -> {
+                    if (Objects.nonNull(beer.getBeerName())) {
+                        foundBeer.setBeerName(beer.getBeerName());
+                    }
+                    if (Objects.nonNull(beer.getBeerStyle())) {
+                        foundBeer.setBeerStyle(beer.getBeerStyle());
+                    }
+                    if (Objects.nonNull(beer.getBeerName())) {
+                        foundBeer.setUpd(beer.getUpd());
+                    }
+                    if (Objects.nonNull(beer.getQuantityOnHand())) {
+                        foundBeer.setQuantityOnHand(beer.getQuantityOnHand());
+                    }
+                    if (Objects.nonNull(beer.getPrice())) {
+                        foundBeer.setPrice(beer.getPrice());
+                    }
+                    foundBeer.setUpdatedTime(LocalDateTime.now());
+
+
+                    atomicReference.set(Optional.of(
+                            beerMapper.beerToBeerDto(
+                                    beerRepository.save(foundBeer))));
+                }, () -> atomicReference.set(Optional.empty())
+        );
+
+        return atomicReference.get();
     }
 }

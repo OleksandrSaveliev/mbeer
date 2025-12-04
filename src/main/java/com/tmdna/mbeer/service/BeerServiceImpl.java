@@ -115,12 +115,12 @@ public class BeerServiceImpl implements BeerService {
     }
 
     @Override
-    public void updateBeerPartially(UUID id, BeerDTO beer) {
+    public Optional<BeerDTO> updateBeerPartially(UUID id, BeerDTO beer) {
 
         BeerDTO existing = beers.get(id);
 
         if (existing == null) {
-            return;
+            return Optional.empty();
         }
 
         if (StringUtils.hasText(beer.getBeerName())) {
@@ -145,5 +145,7 @@ public class BeerServiceImpl implements BeerService {
 
         existing.setVersion(existing.getVersion() + 1);
         existing.setUpdatedTime(LocalDateTime.now());
+
+        return Optional.of(existing);
     }
 }
