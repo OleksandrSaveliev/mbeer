@@ -1,8 +1,8 @@
 package com.tmdna.mbeer.controller;
 
 import com.tmdna.mbeer.config.ApiPaths;
-import com.tmdna.mbeer.exception.NotFoundException;
 import com.tmdna.mbeer.dto.CustomerDTO;
+import com.tmdna.mbeer.exception.NotFoundException;
 import com.tmdna.mbeer.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,9 @@ public class CustomerController {
 
     @DeleteMapping(ApiPaths.ID)
     public ResponseEntity<Void> deleteCustomer(@PathVariable("id") UUID id) {
-        customerService.deleteCustomer(id);
+        if (!customerService.deleteCustomer(id)) {
+            throw new NotFoundException(String.format("Customer with id: %s does not exists.", id));
+        }
         return ResponseEntity.noContent().build();
     }
 
@@ -42,7 +44,7 @@ public class CustomerController {
             @PathVariable("id") UUID id,
             @RequestBody CustomerDTO customer
     ) {
-        customerService.updateCustomerFully(id, customer);
+        customerService.updateCustomerFully(id, customer).orElseThrow(NotFoundException::new);
         return ResponseEntity.noContent().build();
     }
 

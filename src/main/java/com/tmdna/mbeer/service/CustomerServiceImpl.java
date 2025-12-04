@@ -71,8 +71,12 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void deleteCustomer(UUID id) {
+    public boolean deleteCustomer(UUID id) {
+        if (!customers.containsKey(id)) {
+            return false;
+        }
         customers.remove(id);
+        return true;
     }
 
     @Override

@@ -17,10 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class CustomerControllerIT {
+    private final UUID FAILED_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
+
     @Autowired
     CustomerController controller;
 
@@ -29,6 +32,27 @@ class CustomerControllerIT {
 
     @Autowired
     CustomerMapper customerMapper;
+
+    @Test
+    void deleteCustomerByIdNotFoundTest() {
+        assertThrows(NotFoundException.class, () -> controller.deleteCustomer(FAILED_ID));
+    }
+
+    @Rollback
+    @Transactional
+    @Test
+    void deleteCustomerByIdTest() {
+        UUID id = customerRepository.findAll().getFirst().getId();
+
+        assertEquals(HttpStatusCode.valueOf(204), controller.deleteCustomer(id).getStatusCode());
+        assertThat(customerRepository.findById(id)).isEmpty();
+    }
+
+    @Test
+    void updateCustomerFullyNotFoundTest() {
+        CustomerDTO customerDTO = CustomerDTO.builder().build();
+        assertThrows(NotFoundException.class, () -> controller.uprateCustomerFully(FAILED_ID, customerDTO));
+    }
 
     @Rollback
     @Transactional
@@ -47,9 +71,8 @@ class CustomerControllerIT {
 
     @Test
     void getCustomerByIdNotFoundTest () {
-        UUID id = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
-        assertThrows(NotFoundException.class,() -> controller.getCustomerById(id));
+        assertThrows(NotFoundException.class, () -> controller.getCustomerById(FAILED_ID));
     }
 
     @Test

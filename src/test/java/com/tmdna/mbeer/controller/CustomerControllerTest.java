@@ -2,8 +2,8 @@ package com.tmdna.mbeer.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tmdna.mbeer.config.ApiPaths;
-import com.tmdna.mbeer.exception.NotFoundException;
 import com.tmdna.mbeer.dto.CustomerDTO;
+import com.tmdna.mbeer.exception.NotFoundException;
 import com.tmdna.mbeer.service.CustomerService;
 import com.tmdna.mbeer.service.CustomerServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -91,6 +91,8 @@ class CustomerControllerTest {
     void deleteCustomer() throws Exception {
         CustomerDTO customer = customerServiceImpl.getAllCustomers().getFirst();
 
+        given(customerService.deleteCustomer(any(UUID.class))).willReturn(true);
+
         mvc.perform(delete(ApiPaths.Customer.WITH_ID, customer.getId())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
@@ -103,6 +105,8 @@ class CustomerControllerTest {
     @Test
     void uprateCustomerFully() throws Exception {
         CustomerDTO customer = customerServiceImpl.getAllCustomers().getFirst();
+
+        given(customerService.updateCustomerFully(any(UUID.class),any())).willReturn(Optional.of(customer));
 
         mvc.perform(put(ApiPaths.Customer.WITH_ID, customer.getId())
                         .accept(MediaType.APPLICATION_JSON)
