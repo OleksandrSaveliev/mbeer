@@ -90,6 +90,8 @@ class BeerControllerTest {
     void deleteBeer() throws Exception {
         BeerDTO beer = beerServiceImpl.getAllBeers().getFirst();
 
+        given(beerService.deleteBeer(any(UUID.class))).willReturn(true);
+
         mvc.perform(delete(ApiPaths.Beer.WITH_ID, beer.getId())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());

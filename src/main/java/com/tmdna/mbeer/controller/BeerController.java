@@ -31,7 +31,9 @@ public class BeerController {
 
     @DeleteMapping(ApiPaths.ID)
     public ResponseEntity<Void> deleteBeer(@PathVariable("id") UUID id) {
-        beerService.deleteBeer(id);
+        if (!beerService.deleteBeer(id)) {
+            throw new NotFoundException(String.format("Beer with id: %s does not exists.", id));
+        }
         return ResponseEntity.noContent().build();
     }
 

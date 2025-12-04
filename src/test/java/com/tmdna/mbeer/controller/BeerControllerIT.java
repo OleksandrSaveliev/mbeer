@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -31,6 +32,22 @@ class BeerControllerIT {
 
     @Autowired
     BeerMapper beerMapper;
+
+
+    @Test
+    void deleteBeerByIdNotFoundTest() {
+        assertThrows(NotFoundException.class, () -> controller.deleteBeer(FAILED_UUID));
+    }
+
+    @Rollback
+    @Transactional
+    @Test
+    void deleteBeerByIdTest() {
+        Beer beer = beerRepository.findAll().getFirst();
+        UUID id = beer.getId();
+        assertThat(controller.deleteBeer(id).getStatusCode()).isEqualTo(HttpStatusCode.valueOf(204));
+        assertThrows(NotFoundException.class, () -> controller.getBeerById(id));
+    }
 
     @Test
     void updateBeerFullyNotFoundTest() {
