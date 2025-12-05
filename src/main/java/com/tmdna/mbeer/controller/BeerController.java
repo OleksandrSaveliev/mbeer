@@ -6,6 +6,7 @@ import com.tmdna.mbeer.exception.NotFoundException;
 import com.tmdna.mbeer.service.BeerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -58,7 +59,7 @@ public class BeerController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createBeer(@RequestBody BeerDTO beer) {
+    public ResponseEntity<Void> createBeer(@Validated @RequestBody BeerDTO beer) {
         BeerDTO createdBeer = beerService.createBeer(beer);
 
         URI location = ServletUriComponentsBuilder

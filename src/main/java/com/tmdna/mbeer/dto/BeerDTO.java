@@ -1,5 +1,7 @@
 package com.tmdna.mbeer.dto;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 
@@ -12,7 +14,11 @@ import java.util.UUID;
 public class BeerDTO {
     private UUID id;
     private Integer version;
+
+    @NotEmpty
+    @NotNull
     private String beerName;
+
     private String beerStyle;
     private String upd;
     private Integer quantityOnHand;
