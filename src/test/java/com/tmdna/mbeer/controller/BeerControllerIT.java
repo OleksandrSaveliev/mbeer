@@ -5,6 +5,7 @@ import com.tmdna.mbeer.exception.NotFoundException;
 import com.tmdna.mbeer.mapper.BeerMapper;
 import com.tmdna.mbeer.model.Beer;
 import com.tmdna.mbeer.repository.BeerRepository;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,6 +35,25 @@ class BeerControllerIT {
 
     @Autowired
     BeerMapper beerMapper;
+
+    @Rollback
+    @Transactional
+    @Test
+    void saveBeer_withInvalidValues_constraintViolationException() {
+        BeerDTO beerDTO = BeerDTO.builder()
+                .beerName("a".repeat(51))
+                .beerStyle("style")
+                .upd("12312321")
+                .price(new BigDecimal("12.33"))
+                .build();
+
+        Beer beer = beerMapper.beerDtoToBeer(beerDTO);
+
+        assertThrows(ConstraintViolationException.class, () -> {
+            beerRepository.saveAndFlush(beer);
+        });
+
+    }
 
     @Rollback
     @Transactional

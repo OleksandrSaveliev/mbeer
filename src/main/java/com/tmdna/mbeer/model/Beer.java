@@ -3,6 +3,8 @@ package com.tmdna.mbeer.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -29,6 +31,8 @@ public class Beer {
 
     @NotEmpty
     @NotNull
+    @Size(max = 50)
+    @Column(length = 50)
     private String beerName;
 
     @NotEmpty
@@ -37,11 +41,13 @@ public class Beer {
 
     @NotEmpty
     @NotNull
+    @Size(max = 50)
     private String upd;
 
     private Integer quantityOnHand;
 
     @NotNull
+    @Positive
     private BigDecimal price;
 
     private LocalDateTime createdTime;
