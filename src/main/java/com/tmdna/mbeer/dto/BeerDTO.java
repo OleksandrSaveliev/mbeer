@@ -19,10 +19,19 @@ public class BeerDTO {
     @NotNull
     private String beerName;
 
+    @NotEmpty
+    @NotNull
     private String beerStyle;
+
+    @NotEmpty
+    @NotNull
     private String upd;
+
     private Integer quantityOnHand;
+
+    @NotNull
     private BigDecimal price;
+
     private LocalDateTime createdTime;
     private LocalDateTime updatedTime;
 }

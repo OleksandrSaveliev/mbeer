@@ -41,7 +41,7 @@ public class BeerController {
     @PutMapping(ApiPaths.ID)
     public ResponseEntity<Void> updateBeerFully(
             @PathVariable("id") UUID id,
-            @RequestBody BeerDTO beer
+            @Validated @RequestBody BeerDTO beer
     ) {
         beerService.updateBeerFully(id, beer).orElseThrow(NotFoundException::new);
         return ResponseEntity.noContent().build();

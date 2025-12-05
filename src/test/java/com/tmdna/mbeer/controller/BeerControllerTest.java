@@ -103,6 +103,24 @@ class BeerControllerTest {
     }
 
     @Test
+    void updateBeerFullyWithEmptyFields() throws Exception {
+        BeerDTO beer = beerServiceImpl.getAllBeers().getFirst();
+        beer.setBeerName(null);
+        beer.setBeerStyle(null);
+        beer.setPrice(null);
+        beer.setUpd(null);
+
+        given(beerService.updateBeerFully(any(UUID.class), any())).willReturn(Optional.of(beer));
+
+       mvc.perform(put(ApiPaths.Beer.WITH_ID, beer.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(beer)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.details.size()", is(7)));
+    }
+
+    @Test
     void updateBeerFully() throws Exception {
         BeerDTO beer = beerServiceImpl.getAllBeers().getFirst();
 
