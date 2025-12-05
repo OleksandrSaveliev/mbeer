@@ -81,7 +81,7 @@ public class BeerServiceJPA implements BeerService {
                     if (Objects.nonNull(beer.getBeerStyle())) {
                         foundBeer.setBeerStyle(beer.getBeerStyle());
                     }
-                    if (Objects.nonNull(beer.getBeerName())) {
+                    if (Objects.nonNull(beer.getUpd())) {
                         foundBeer.setUpd(beer.getUpd());
                     }
                     if (Objects.nonNull(beer.getQuantityOnHand())) {

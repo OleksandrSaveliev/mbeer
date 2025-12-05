@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,6 +34,25 @@ class BeerControllerIT {
 
     @Autowired
     BeerMapper beerMapper;
+
+    @Rollback
+    @Transactional
+    @Test
+    void saveBeer_withCorrectValues() {
+        BeerDTO beerDTO = BeerDTO.builder()
+                .beerName("name")
+                .beerStyle("style")
+                .upd("12312321")
+                .price(new BigDecimal("12.33"))
+                .build();
+
+        Beer savedBeer = beerRepository.save(beerMapper.beerDtoToBeer(beerDTO));
+
+        beerRepository.flush();
+
+        assertThat(savedBeer.getId()).isNotNull();
+        assertEquals("name", savedBeer.getBeerName());
+    }
 
     @Rollback
     @Transactional

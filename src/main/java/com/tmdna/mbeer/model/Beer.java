@@ -1,6 +1,8 @@
 package com.tmdna.mbeer.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -24,11 +26,24 @@ public class Beer {
 
     @Version
     private Integer version;
+
+    @NotEmpty
+    @NotNull
     private String beerName;
+
+    @NotEmpty
+    @NotNull
     private String beerStyle;
+
+    @NotEmpty
+    @NotNull
     private String upd;
+
     private Integer quantityOnHand;
+
+    @NotNull
     private BigDecimal price;
+
     private LocalDateTime createdTime;
     private LocalDateTime updatedTime;
 }
