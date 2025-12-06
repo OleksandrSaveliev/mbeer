@@ -1,25 +1,35 @@
 package com.tmdna.mbeer.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tmdna.mbeer.config.ApiPaths;
 import com.tmdna.mbeer.dto.BeerDTO;
 import com.tmdna.mbeer.exception.NotFoundException;
 import com.tmdna.mbeer.mapper.BeerMapper;
 import com.tmdna.mbeer.model.Beer;
 import com.tmdna.mbeer.repository.BeerRepository;
+import jakarta.validation.ConstraintViolationException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 class BeerControllerIT {
@@ -33,6 +43,71 @@ class BeerControllerIT {
 
     @Autowired
     BeerMapper beerMapper;
+
+    @Autowired
+    WebApplicationContext wac;
+
+    @Autowired
+    ObjectMapper objectMapper;
+
+    MockMvc mockMvc;
+
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+    }
+
+    @Test
+    void updateBeerPartially_withInvalidBeerNameAndPrice_constraintViolationException() throws Exception {
+        Beer beer = beerRepository.findAll().getFirst();
+
+        Map<String, Object> beerMap = new HashMap<>();
+        beerMap.put("beerName", "New Name".repeat(10));
+        beerMap.put("price", new BigDecimal("-1.1"));
+
+        mockMvc.perform(patch(ApiPaths.Beer.WITH_ID, beer.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(beerMap)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.details.size()").value(2));
+    }
+
+    @Test
+    void saveBeer_withInvalidValues_constraintViolationException() {
+        BeerDTO beerDTO = BeerDTO.builder()
+                .beerName("a".repeat(51))
+                .beerStyle("style")
+                .upd("12312321")
+                .price(new BigDecimal("-12.33"))
+                .build();
+
+        Beer beer = beerMapper.beerDtoToBeer(beerDTO);
+
+        assertThrows(ConstraintViolationException.class, () -> {
+            beerRepository.saveAndFlush(beer);
+        });
+
+    }
+
+    @Rollback
+    @Transactional
+    @Test
+    void saveBeer_withCorrectValues() {
+        BeerDTO beerDTO = BeerDTO.builder()
+                .beerName("name")
+                .beerStyle("style")
+                .upd("12312321")
+                .price(new BigDecimal("12.33"))
+                .build();
+
+        Beer savedBeer = beerRepository.save(beerMapper.beerDtoToBeer(beerDTO));
+
+        beerRepository.flush();
+
+        assertThat(savedBeer.getId()).isNotNull();
+        assertEquals("name", savedBeer.getBeerName());
+    }
 
     @Rollback
     @Transactional

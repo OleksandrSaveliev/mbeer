@@ -15,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -102,6 +103,24 @@ class BeerControllerTest {
     }
 
     @Test
+    void updateBeerFullyWithEmptyFields() throws Exception {
+        BeerDTO beer = beerServiceImpl.getAllBeers().getFirst();
+        beer.setBeerName(null);
+        beer.setBeerStyle(null);
+        beer.setPrice(null);
+        beer.setUpd(null);
+
+        given(beerService.updateBeerFully(any(UUID.class), any())).willReturn(Optional.of(beer));
+
+       mvc.perform(put(ApiPaths.Beer.WITH_ID, beer.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(beer)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.details.size()", is(7)));
+    }
+
+    @Test
     void updateBeerFully() throws Exception {
         BeerDTO beer = beerServiceImpl.getAllBeers().getFirst();
 
@@ -114,6 +133,20 @@ class BeerControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(beerService).updateBeerFully(any(UUID.class), any(BeerDTO.class));
+    }
+
+    @Test
+    void createBeerWithNullName() throws Exception {
+        BeerDTO beerDTO = BeerDTO.builder().build();
+
+        given(beerService.createBeer(any(BeerDTO.class))).willReturn(beerDTO);
+
+        MvcResult mvcResult = mvc.perform(post(ApiPaths.Beer.BASE)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(beerDTO)))
+                .andExpect(status().isBadRequest()).andReturn();
+        System.out.println(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
@@ -132,7 +165,7 @@ class BeerControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(beer)))
                 .andExpect(status().isCreated())
-                .andExpect(header().exists("Location"));
+                .andExpect(header().exists("Location")).andReturn();
     }
 
     @Test
