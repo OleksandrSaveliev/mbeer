@@ -160,14 +160,12 @@ class BeerControllerTest {
         given(beerService.createBeer(any(BeerDTO.class)))
                 .willReturn(beerServiceImpl.getAllBeers().get(1));
 
-        MvcResult mvcResult = mvc.perform(post(ApiPaths.Beer.BASE)
+        mvc.perform(post(ApiPaths.Beer.BASE)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(beer)))
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Location")).andReturn();
-
-        System.out.println(mvcResult);
     }
 
     @Test

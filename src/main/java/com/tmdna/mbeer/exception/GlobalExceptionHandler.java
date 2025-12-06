@@ -18,7 +18,8 @@ import java.util.List;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(TransactionSystemException.class)
-    public ResponseEntity<ErrorResponse> handleTransactionSystemException(TransactionSystemException exception, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleTransactionSystemException(TransactionSystemException exception,
+                                                                          WebRequest request) {
 
         String errorMessage = "Database transaction error";
         List<String> details = new ArrayList<>();
@@ -26,7 +27,8 @@ public class GlobalExceptionHandler {
         if (rootCause instanceof ConstraintViolationException ex) {
             errorMessage = "Database constraint violation";
             details = ex.getConstraintViolations().stream()
-                    .map(violation -> violation.getPropertyPath().toString() + ": " + violation.getMessage())
+                    .map(violation ->
+                            violation.getPropertyPath().toString() + ": " + violation.getMessage())
                     .toList();
         } else {
             details.add(rootCause != null ? rootCause.getMessage() : "Unknown database error");
@@ -45,7 +47,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException exception, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException exception,
+                                                                    WebRequest request) {
 
         List<String> details = exception.getBindingResult()
                 .getFieldErrors()
