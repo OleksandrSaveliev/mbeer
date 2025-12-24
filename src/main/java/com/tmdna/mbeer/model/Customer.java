@@ -2,7 +2,9 @@ package com.tmdna.mbeer.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -18,7 +20,8 @@ public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @UuidGenerator
-    @Column(length = 36, columnDefinition = "varchar", nullable = false, updatable = false)
+    @JdbcTypeCode(SqlTypes.CHAR)
+    @Column(length = 36, columnDefinition = "varchar(36)", nullable = false, updatable = false)
     private UUID id;
     private String customerName;
 
