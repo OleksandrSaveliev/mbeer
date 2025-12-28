@@ -1,17 +1,24 @@
 package com.tmdna.mbeer.config;
 
+import com.opencsv.bean.CsvToBeanBuilder;
 import com.tmdna.mbeer.model.Beer;
+import com.tmdna.mbeer.model.BeerCSVRecord;
 import com.tmdna.mbeer.model.Customer;
 import com.tmdna.mbeer.repository.BeerRepository;
 import com.tmdna.mbeer.repository.CustomerRepository;
+import com.tmdna.mbeer.service.BeerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.FileReader;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
