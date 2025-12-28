@@ -1,20 +1,20 @@
 package com.tmdna.mbeer.config;
 
-import com.opencsv.bean.CsvToBeanBuilder;
 import com.tmdna.mbeer.model.Beer;
 import com.tmdna.mbeer.model.BeerCSVRecord;
 import com.tmdna.mbeer.model.Customer;
 import com.tmdna.mbeer.repository.BeerRepository;
 import com.tmdna.mbeer.repository.CustomerRepository;
-import com.tmdna.mbeer.service.BeerService;
+import com.tmdna.mbeer.service.BeerCsvService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ResourceUtils;
+import org.springframework.util.StringUtils;
 
-import java.io.FileReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -26,12 +26,41 @@ public class DataInitializer implements CommandLineRunner {
 
     private final BeerRepository beerRepository;
     private final CustomerRepository customerRepository;
+    private final BeerCsvService csvService;
 
     @Transactional
     @Override
     public void run(String... args) throws Exception {
         loadCustomerData();
+        loadCsvData();
         loadBeerData();
+    }
+
+    private void loadCsvData() throws FileNotFoundException {
+        if (beerRepository.count() < 10) {
+            File csvFile = ResourceUtils.getFile("classpath:csvdata/beers.csv");
+            List<BeerCSVRecord> beerCSVRecords = csvService.parseCsv(csvFile);
+
+            for (BeerCSVRecord beerCSVRecord : beerCSVRecords) {
+                String beerName = beerCSVRecord.getBeer();
+
+                if (beerName.length() > 50) {
+                    beerName = beerName.substring(0, 47) + "...";
+                }
+
+                Beer beer = Beer.builder()
+                        .beerName(beerName)
+                        .upd(beerCSVRecord.getIbu())
+                        .price(BigDecimal.TEN)
+                        .quantityOnHand(beerCSVRecord.getCount())
+                        .beerStyle(beerCSVRecord.getStyle())
+                        .createdTime(LocalDateTime.now())
+                        .updatedTime(LocalDateTime.now())
+                        .build();
+
+                beerRepository.save(beer);
+            }
+        }
     }
 
     private void loadBeerData() {

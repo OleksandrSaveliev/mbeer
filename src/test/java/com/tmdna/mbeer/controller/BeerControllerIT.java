@@ -217,11 +217,11 @@ class BeerControllerIT {
     }
 
     @Test
-    void getBeerByIdListTest() {
+    void getBeerListTest() {
         List<BeerDTO> beerDTOS = controller.getBeers().getBody();
 
         assertNotNull(beerDTOS);
-        assertEquals(3, beerDTOS.size());
+        assertThat(beerDTOS.size()).isNotZero();
     }
 
     @Rollback
