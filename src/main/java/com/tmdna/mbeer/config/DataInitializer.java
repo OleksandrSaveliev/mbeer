@@ -54,8 +54,6 @@ public class DataInitializer implements CommandLineRunner {
                         .price(BigDecimal.TEN)
                         .quantityOnHand(beerCSVRecord.getCount())
                         .beerStyle(beerCSVRecord.getStyle())
-                        .createdTime(LocalDateTime.now())
-                        .updatedTime(LocalDateTime.now())
                         .build();
 
                 beerRepository.save(beer);
