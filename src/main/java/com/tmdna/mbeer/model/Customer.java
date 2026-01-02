@@ -2,7 +2,9 @@ package com.tmdna.mbeer.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.type.SqlTypes;
 
@@ -30,6 +32,10 @@ public class Customer {
 
     @Column(length = 255)
     private String email;
+
+    @CreationTimestamp
     private LocalDateTime createdTime;
+
+    @UpdateTimestamp
     private LocalDateTime updatedTime;
 }
