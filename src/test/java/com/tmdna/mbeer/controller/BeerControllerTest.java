@@ -70,7 +70,7 @@ class BeerControllerTest {
 
     @Test
     void updateBeerPartially() throws Exception {
-        BeerDTO beer = beerServiceImpl.getAllBeers().getFirst();
+        BeerDTO beer = beerServiceImpl.getBeers(null).getFirst();
 
         Map<String, Object> beerMap = new HashMap<>();
         beerMap.put("beerName", "New Name");
@@ -89,7 +89,7 @@ class BeerControllerTest {
 
     @Test
     void deleteBeer() throws Exception {
-        BeerDTO beer = beerServiceImpl.getAllBeers().getFirst();
+        BeerDTO beer = beerServiceImpl.getBeers(null).getFirst();
 
         given(beerService.deleteBeer(any(UUID.class))).willReturn(true);
 
@@ -104,7 +104,7 @@ class BeerControllerTest {
 
     @Test
     void updateBeerFullyWithEmptyFields() throws Exception {
-        BeerDTO beer = beerServiceImpl.getAllBeers().getFirst();
+        BeerDTO beer = beerServiceImpl.getBeers(null).getFirst();
         beer.setBeerName(null);
         beer.setBeerStyle(null);
         beer.setPrice(null);
@@ -122,7 +122,7 @@ class BeerControllerTest {
 
     @Test
     void updateBeerFully() throws Exception {
-        BeerDTO beer = beerServiceImpl.getAllBeers().getFirst();
+        BeerDTO beer = beerServiceImpl.getBeers(null).getFirst();
 
         given(beerService.updateBeerFully(any(UUID.class), any())).willReturn(Optional.of(beer));
 
@@ -151,14 +151,14 @@ class BeerControllerTest {
 
     @Test
     void createBeer() throws Exception {
-        BeerDTO beer = beerServiceImpl.getAllBeers().getFirst();
+        BeerDTO beer = beerServiceImpl.getBeers(null).getFirst();
         beer.setId(null);
         beer.setVersion(null);
         beer.setUpdatedTime(null);
         beer.setCreatedTime(null);
 
         given(beerService.createBeer(any(BeerDTO.class)))
-                .willReturn(beerServiceImpl.getAllBeers().get(1));
+                .willReturn(beerServiceImpl.getBeers(null).get(1));
 
         mvc.perform(post(ApiPaths.Beer.BASE)
                         .accept(MediaType.APPLICATION_JSON)
@@ -171,18 +171,18 @@ class BeerControllerTest {
     @Test
     void getAllBeers() throws Exception {
 
-        given(beerService.getAllBeers()).willReturn(beerServiceImpl.getAllBeers());
+        given(beerService.getBeers(null)).willReturn(beerServiceImpl.getBeers(null));
 
         mvc.perform(get(ApiPaths.Beer.BASE)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()", is(beerServiceImpl.getAllBeers().size())));
+                .andExpect(jsonPath("$.size()", is(beerServiceImpl.getBeers(null).size())));
     }
 
     @Test
     void getBeerByIdById() throws Exception {
 
-        BeerDTO beer = beerServiceImpl.getAllBeers().getFirst();
+        BeerDTO beer = beerServiceImpl.getBeers(null).getFirst();
 
         given(beerService.getBeerById(beer.getId())).willReturn(Optional.of(beer));
 

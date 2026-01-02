@@ -2,16 +2,15 @@ package com.tmdna.mbeer.service;
 
 import com.tmdna.mbeer.dto.BeerDTO;
 import com.tmdna.mbeer.mapper.BeerMapper;
+import com.tmdna.mbeer.model.Beer;
 import com.tmdna.mbeer.repository.BeerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Service
@@ -28,10 +27,21 @@ public class BeerServiceJPA implements BeerService {
     }
 
     @Override
-    public List<BeerDTO> getAllBeers() {
-        return beerRepository.findAll().stream()
+    public List<BeerDTO> getBeers(String beerName) {
+        List<Beer> beerList;
+        if (StringUtils.hasText(beerName)) {
+            beerList = getBeersByName(beerName);
+        } else {
+            beerList = beerRepository.findAll();
+        }
+
+        return beerList.stream()
                 .map(beerMapper::beerToBeerDto)
                 .toList();
+    }
+
+    private List<Beer> getBeersByName(String beerName) {
+        return beerRepository.findAllByBeerNameContainingIgnoreCase(beerName);
     }
 
     @Override

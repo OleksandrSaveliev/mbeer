@@ -48,8 +48,8 @@ public class BeerController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BeerDTO>> getBeers() {
-        return ResponseEntity.ok(beerService.getAllBeers());
+    public ResponseEntity<List<BeerDTO>> getBeers(@RequestParam(required = false) String beerName) {
+        return ResponseEntity.ok(beerService.getBeers(beerName));
     }
 
     @GetMapping(ApiPaths.ID)

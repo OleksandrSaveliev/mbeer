@@ -62,7 +62,7 @@ public class BeerServiceImpl implements BeerService {
         return Optional.of(beers.get(id));
     }
 
-    public List<BeerDTO> getAllBeers() {
+    public List<BeerDTO> getBeers(String beerName) {
         return new ArrayList<>(beers.values());
     }
 
