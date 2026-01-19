@@ -1,12 +1,5 @@
 package com.tmdna.mbeer.service;
 
-import com.tmdna.mbeer.dto.CustomerDTO;
-import com.tmdna.mbeer.mapper.CustomerMapper;
-import com.tmdna.mbeer.repository.CustomerRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -14,10 +7,20 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
+
+import com.tmdna.mbeer.dto.CustomerDTO;
+import com.tmdna.mbeer.mapper.CustomerMapper;
+import com.tmdna.mbeer.repository.CustomerRepository;
+
+import lombok.RequiredArgsConstructor;
+
 @Service
 @Primary
 @RequiredArgsConstructor
 public class CustomerServiceJPA implements CustomerService {
+
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
 
@@ -36,7 +39,9 @@ public class CustomerServiceJPA implements CustomerService {
 
     @Override
     public CustomerDTO createCustomer(CustomerDTO customer) {
-        return null;
+        return customerMapper.customerToCustomerDto(
+                customerRepository.save(customerMapper.customerDtoToCustomer(customer))
+        );
     }
 
     @Override
